@@ -1,0 +1,68 @@
+<div class="numbers__item-numb" data-numbers="1635">0</div>
+
+<script>
+    /**
+     * numberAnim - класс для анимации чисел
+     */
+    class numberAnim {
+
+        /**
+         * 
+         * @constructor
+         * @param elem Элемент для вывода
+         * @param {number} startVal Стартовое значение
+         * @param {number} endVal Конечное значение
+         * @param {number} time Время анимация
+         * 
+         *  */
+        constructor(elem, startVal, endVal, time = 1000) {
+            this.isWorked = false;
+            this.timeStep = 50;
+            this.elem = elem;
+            this.startVal = +startVal;
+            this.endVal = +endVal;
+            this.time = +time;
+            this.step = Math.ceil((this.endVal - this.startVal) / (this.time / this.timeStep));
+
+
+            this.observer = new IntersectionObserver(() => {
+                if (!this.isWorked) {
+                    this._anim();
+                    this.isWorked = true;
+                }
+            }, {
+                threshold: .5
+            });
+
+            this.observer.observe(this.elem);
+        }
+
+        _anim() {
+            let n = this.startVal;
+            this.interval = setInterval(() => {
+                n = n + this.step;
+                if (n >= this.endVal) {
+                    this.elem.innerHTML = this.endVal;
+                    clearInterval(this.interval);
+                    delete this
+                } else {
+                    this.elem.innerHTML = n;
+                }
+            }, this.timeStep);
+        }
+    }
+
+    function initNumbers() {
+        document.querySelectorAll('[data-numbers]').forEach(number => {
+            new numberAnim(number, 0, number.dataset.numbers, 1500);
+        });
+    }
+
+    if (document.readyState !== 'loading') {
+        initNumbers();
+    } else {
+        document.addEventListener('DOMContentLoaded', function () {
+            initNumbers();
+        });
+    }
+</script>
